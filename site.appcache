@@ -7,3 +7,7 @@ HTML5_Logo_512.png
 
 # disable this file due to time to take to download
 # 1.ogg
+
+# Do not block network access for unlisted assets, e.g. the music
+NETWORK:
+*
