@@ -42,6 +42,8 @@
     var isGameOver = false;
     
     var iDB;
+    var transaction;
+    var store;
 
 /*******************Initialization Functions*****************************************/
 
@@ -276,9 +278,9 @@
         if (highscore < score) {
           highscore = score;
           document.getElementById("highscore").innerHTML = 'High Score: ' + highscore;
-            var transaction = iDB.transaction(
+            transaction = iDB.transaction(
 				'store', IDBTransaction.READ_WRITE);
-			var store = 
+			store = 
 			  transaction.objectStore('store');
 			var req = store.put({
 				key: 'foo',
@@ -481,8 +483,8 @@
 		  iDB = ev.target.result;
 		};
 		
-	   var transaction = iDB.transaction('store');
-		var store = 
+	   transaction = iDB.transaction('store');
+	   store = 
 		  transaction.objectStore('store');
 		var req = store.get('foo');
 		req.onsuccess = function (ev) {
