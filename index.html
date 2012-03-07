@@ -40,6 +40,16 @@
 
     var gamePause = false;
     var isGameOver = false;
+    
+    var indexedDB = window.indexedDB ||
+	  window.webkitIndexedDB ||
+	  window.mozIndexedDB ||
+	  window.msIndexedDB;
+	
+	if (!indexedDB || 
+	IDBDatabase.prototype.setVersion) {
+		alert('not support or old version.');
+	}
 
 /*******************Initialization Functions*****************************************/
 
@@ -274,6 +284,17 @@
         if (highscore < score) {
           highscore = score;
           document.getElementById("highscore").innerHTML = 'High Score: ' + highscore;
+            var transaction = iDB.transaction(
+				'store', IDBTransaction.READ_WRITE);
+			var store = 
+			  transaction.objectStore('store');
+			var req = store.put({
+				key: 'foo',
+				value: highscore
+			  });
+			req.onsuccess = function (ev) {
+			  alert(req.result);
+			};
         }
         isGameOver = true;
         document.getElementById("status").innerHTML = "<p style=\"font-size:20px; color:#333; font-family:Arial;\">Game Over. Press F5 to restart.</p>";
@@ -458,6 +479,24 @@
 
     // WIDS Workshop: this is the window.onload function.
     // Init IndexedDB here and read the save highscore value here.
+		var iDB;
+		var req = mozIndexedDB.open('DBName', 1);
+		req.onupgradeneeded = function (ev) {
+		  iDB.createObjectStore(
+			'store', { keyPath: 'key' });
+		};
+		req.onsuccess = function (ev) {
+		  iDB = ev.target.result;
+		};
+		
+	   var transaction = iDB.transaction('store');
+		var store = 
+		  transaction.objectStore('store');
+		var req = store.get('foo');
+		req.onsuccess = function (ev) {
+		  alert(req.result);
+		  highscore = req.result;
+		};
 	}
 
     //calls init function whenever the page gets fully loaded
