@@ -40,16 +40,6 @@
 
     var gamePause = false;
     var isGameOver = false;
-    
-    var indexedDB = window.indexedDB ||
-	  window.webkitIndexedDB ||
-	  window.mozIndexedDB ||
-	  window.msIndexedDB;
-	
-	if (!indexedDB || 
-	IDBDatabase.prototype.setVersion) {
-		alert('not support or old version.');
-	}
 
 /*******************Initialization Functions*****************************************/
 
