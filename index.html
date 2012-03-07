@@ -40,15 +40,6 @@
 
     var gamePause = false;
     var isGameOver = false;
-    
-    var iDB;
-    var transaction;
-    var store;
-    
-    var indexedDB = window.indexedDB ||
-  window.webkitIndexedDB ||
-  window.mozIndexedDB ||
-  window.msIndexedDB;
 
 /*******************Initialization Functions*****************************************/
 
@@ -283,17 +274,7 @@
         if (highscore < score) {
           highscore = score;
           document.getElementById("highscore").innerHTML = 'High Score: ' + highscore;
-            transaction = iDB.transaction(
-				'store', IDBTransaction.READ_WRITE);
-			store = 
-			  transaction.objectStore('store');
-			var req = store.put({
-				key: 'foo',
-				value: highscore
-			  });
-			req.onsuccess = function (ev) {
-			  alert(req.result);
-			};
+          updateHighScoretoIDB();
         }
         isGameOver = true;
         document.getElementById("status").innerHTML = "<p style=\"font-size:20px; color:#333; font-family:Arial;\">Game Over. Press F5 to restart.</p>";
@@ -479,22 +460,43 @@
     // WIDS Workshop: this is the window.onload function.
     // Init IndexedDB here and read the save highscore value here.
 		
-		var req = indexedDB.open('DBName', 1);
+		var req = mozIndexedDB.open('DBName', 1);
 		req.onupgradeneeded = function (ev) {
 		  iDB.createObjectStore(
 			'store', { keyPath: 'key' });
 		};
 		req.onsuccess = function (ev) {
 		  iDB = ev.target.result;
+		  getHighScorefromIDB();
 		};
-		
-	   transaction = iDB.transaction('store');
-	   store = 
+	}
+	
+	function getHighScorefromIDB()
+	{
+	   var transaction = iDB.transaction('store');
+	   var store = 
 		  transaction.objectStore('store');
-		var req = store.get('foo');
+		var req = store.get('highscore');
 		req.onsuccess = function (ev) {
 		  alert(req.result);
-		  highscore = req.result;
+		  highscore = req.result['value'];
+		  document.getElementById("highscore").innerHTML = 'High Score: ' + highscore;
+		};
+	}
+	
+	function updateHighScoretoIDB()
+	{
+		if (!iDB) // IndexedDB is not available
+		  return;
+		var transaction = iDB.transaction('store', IDBTransaction.READ_WRITE);
+		var store =
+		  transaction.objectStore('store');
+		var req = store.put({
+		  key: 'highscore',
+		  value: highscore
+		});
+		req.onsuccess = function (ev) {
+		  alert(req.result);
 		};
 	}
 
@@ -506,7 +508,7 @@
 		.applicationCache.addEventListener(
 		 'updateready',
 		 function(e) {
-		   var reload = window.confirm("Update Now 123?");
+		   var reload = window.confirm('Update Now 123?');
 		   if (reload)
 			  window.location.reload();
 		 },
